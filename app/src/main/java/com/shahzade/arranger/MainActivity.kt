@@ -15,429 +15,265 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.max
-import kotlin.math.min
 
-private val Panel = Color(0xFF20252B)
-private val PanelLight = Color(0xFF343B43)
-private val Gold = Color(0xFFD5A84D)
-private val Screen = Color(0xFF172A31)
-private val Green = Color(0xFF55D68B)
-private val Red = Color(0xFFE45C58)
+private val BodyColor = Color(0xFF292326)
+private val PanelColor = Color(0xFF171719)
+private val RedColor = Color(0xFFB91C1C)
+private val GoldColor = Color(0xFFD2B16D)
+private val ScreenColor = Color(0xFF101D38)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        window.decorView.systemUiVisibility =
-            (android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
-                or android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        window.decorView.systemUiVisibility = 5894 or 1024 or 512
+        requestedOrientation =
+            android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         setContent {
             MaterialTheme {
-                ShahzadeApp()
+                ArrangerScreen()
             }
         }
     }
 }
 
 @Composable
-private fun ShahzadeApp() {
+fun ArrangerScreen() {
+    var playing by remember { mutableStateOf(false) }
     var tempo by remember { mutableIntStateOf(120) }
     var transpose by remember { mutableIntStateOf(0) }
-    var playing by remember { mutableStateOf(false) }
-    var settings by remember { mutableStateOf(false) }
-    var dualKeyboard by remember { mutableStateOf(false) }
-    var keyCount by remember { mutableIntStateOf(14) }
-    var startNote by remember { mutableStateOf("C") }
     var style by remember { mutableStateOf("LORI 01") }
-    var selectedSound by remember { mutableStateOf("Concert Piano") }
-    var chord by remember { mutableStateOf("C") }
+    var selectedSound by remember { mutableStateOf("GRAND PIANO") }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color(0xFF111519)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .padding(5.dp)
     ) {
-        if (settings) {
-            SettingsScreen(
-                keyCount, { keyCount = it },
-                startNote, { startNote = it },
-                dualKeyboard, { dualKeyboard = it },
-                onBack = { settings = false }
-            )
-        } else {
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF514347), BodyColor, Color(0xFF171416))
+                    ),
+                    RoundedCornerShape(12.dp)
+                )
+                .border(2.dp, Color(0xFF65565A), RoundedCornerShape(12.dp))
+                .padding(7.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(
-                Modifier.fillMaxSize()
-                    .padding(7.dp)
-                    .background(Panel, RoundedCornerShape(14.dp))
-                    .border(1.dp, Gold.copy(alpha = .65f), RoundedCornerShape(14.dp))
-                    .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier.weight(0.85f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text("KORG", color = Color.White, fontSize = 23.sp,
+                    fontWeight = FontWeight.Black)
+                Text("Pa700 STYLE", color = GoldColor, fontSize = 10.sp)
+                Spacer(Modifier.height(12.dp))
+                PanelButton("MASTER VOLUME", Color.DarkGray) {}
+                PanelButton("BALANCE", Color.DarkGray) {}
+                PanelButton("MODE", PanelColor) {}
+                PanelButton("SONG", PanelColor) {}
+            }
+
+            Column(
+                modifier = Modifier.weight(2.5f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("KORG-SHAHZADE", color = GoldColor,
+                    fontSize = 18.sp, fontWeight = FontWeight.Black)
+                Spacer(Modifier.height(5.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .background(ScreenColor, RoundedCornerShape(8.dp))
+                        .border(3.dp, Color(0xFF85858A), RoundedCornerShape(8.dp))
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("STYLE PLAY", color = GoldColor, fontSize = 12.sp)
+                        Text("TEMPO $tempo", color = Color.White, fontSize = 12.sp)
+                        Text("READY", color = Color.Green, fontSize = 12.sp)
+                    }
+                    Spacer(Modifier.height(9.dp))
+                    Text(style, color = Color.White, fontSize = 23.sp,
+                        fontWeight = FontWeight.Bold)
+                    Text(selectedSound, color = Color(0xFFB8D9FF), fontSize = 13.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        ScreenButton("STYLE") { style = "LORI 01" }
+                        ScreenButton("SOUND") { selectedSound = "GRAND PIANO" }
+                        ScreenButton("MEDIA") { selectedSound = "MEDIA" }
+                        ScreenButton("GLOBAL") { selectedSound = "GLOBAL" }
+                    }
+                }
+
+                Spacer(Modifier.height(6.dp))
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text(
-                        "KORG • SHAHZADE",
-                        color = Gold,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 17.sp
-                    )
+                    PanelButton("INTRO", PanelColor) {}
+                    PanelButton("VARIATION", PanelColor) {}
+                    PanelButton("FILL", PanelColor) {}
+                    PanelButton("BREAK", PanelColor) {}
+                    PanelButton("ENDING", PanelColor) {}
+                }
+            }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        StatusLamp("STYLE", playing, Green)
-                        StatusLamp("RECORD", false, Red)
-                        PanelButton("SETTINGS", Gold, Modifier.width(90.dp)) {
-                            settings = true
-                        }
+            Column(
+                modifier = Modifier.weight(0.9f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("VALUE", color = GoldColor, fontSize = 12.sp)
+                Spacer(Modifier.height(8.dp))
+                PanelButton("SELECT", Color.DarkGray) {}
+                Spacer(Modifier.height(12.dp))
+                Text("TEMPO", color = Color.White, fontSize = 12.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    PanelButton("−", PanelColor) {
+                        tempo = (tempo - 1).coerceAtLeast(30)
+                    }
+                    PanelButton("+", PanelColor) {
+                        tempo = (tempo + 1).coerceAtMost(300)
                     }
                 }
-
-                Row(
-                    Modifier.weight(1f).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(7.dp)
-                ) {
-                    Column(
-                        Modifier.weight(1.05f),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Text("SOUND SELECT", color = Gold, fontSize = 10.sp)
-
-                        PanelButton(
-                            "UPPER 1 • $selectedSound",
-                            PanelLight,
-                            Modifier.fillMaxWidth()
-                        ) {
-                            selectedSound =
-                                if (selectedSound == "Concert Piano")
-                                    "Warm Strings" else "Concert Piano"
-                        }
-
-                        PanelButton("UPPER 2 • OFF", PanelLight, Modifier.fillMaxWidth()) {}
-                        PanelButton("UPPER 3 • OFF", PanelLight, Modifier.fillMaxWidth()) {}
-                        PanelButton("LOWER • Grand Piano", PanelLight, Modifier.fillMaxWidth()) {}
-
-                        Spacer(Modifier.weight(1f))
-
-                        Text("STS", color = Gold, fontSize = 11.sp)
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            (1..4).forEach {
-                                PanelButton("$it", PanelLight, Modifier.weight(1f)) {}
-                            }
-                        }
+                Text("$tempo BPM", color = GoldColor, fontSize = 12.sp)
+                Spacer(Modifier.height(8.dp))
+                Text("TRANSPOSE", color = Color.White, fontSize = 11.sp)
+                Row {
+                    PanelButton("−", PanelColor) {
+                        transpose = (transpose - 1).coerceAtLeast(-12)
                     }
-
-                    Column(
-                        Modifier.weight(1.35f),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Box(
-                            Modifier.fillMaxWidth()
-                                .weight(1f)
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(Color(0xFF29434B), Screen)
-                                    ),
-                                    RoundedCornerShape(8.dp)
-                                )
-                                .border(1.dp, Color(0xFF6D9294), RoundedCornerShape(8.dp))
-                                .padding(9.dp)
-                        ) {
-                            Column(
-                                Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text("STYLE: $style", color = Color.White, fontSize = 12.sp)
-                                    Text("BPM $tempo", color = Gold, fontSize = 13.sp)
-                                }
-
-                                Text(
-                                    selectedSound,
-                                    color = Color.White,
-                                    fontSize = 19.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-
-                                Row(
-                                    Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text("CHORD $chord", color = Color.White, fontSize = 12.sp)
-                                    Text("TRANSPOSE $transpose", color = Color.White, fontSize = 12.sp)
-                                    Text("UPPER ON", color = Green, fontSize = 12.sp)
-                                }
-                            }
-                        }
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                            PanelButton("TEMPO −", PanelLight, Modifier.weight(1f)) {
-                                tempo = max(30, tempo - 1)
-                            }
-                            PanelButton("TEMPO +", PanelLight, Modifier.weight(1f)) {
-                                tempo = min(300, tempo + 1)
-                            }
-                            PanelButton("TAP", PanelLight, Modifier.weight(.7f)) {
-                                tempo = (tempo + 2).coerceAtMost(300)
-                            }
-                        }
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                            PanelButton("TRANS −", PanelLight, Modifier.weight(1f)) {
-                                transpose = (transpose - 1).coerceIn(-12, 12)
-                            }
-                            PanelButton("RESET", PanelLight, Modifier.weight(.8f)) {
-                                transpose = 0
-                            }
-                            PanelButton("TRANS +", PanelLight, Modifier.weight(1f)) {
-                                transpose = (transpose + 1).coerceIn(-12, 12)
-                            }
-                        }
-                    }
-
-                    Column(
-                        Modifier.weight(1.05f),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Text("STYLE CONTROL", color = Gold, fontSize = 10.sp)
-
-                        PanelButton(
-                            if (playing) "START / STOP ■" else "START / STOP ▶",
-                            if (playing) Red else Green,
-                            Modifier.fillMaxWidth()
-                        ) {
-                            playing = !playing
-                        }
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            PanelButton("INTRO 1", PanelLight, Modifier.weight(1f)) {}
-                            PanelButton("ENDING 1", PanelLight, Modifier.weight(1f)) {}
-                        }
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            PanelButton("FILL 1", PanelLight, Modifier.weight(1f)) {}
-                            PanelButton("BREAK", PanelLight, Modifier.weight(1f)) {}
-                        }
-
-                        Text("VARIATION", color = Gold, fontSize = 10.sp)
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            (1..4).forEach {
-                                PanelButton("VAR $it", PanelLight, Modifier.weight(1f)) {}
-                            }
-                        }
-
-                        PanelButton("STYLE: $style", PanelLight, Modifier.fillMaxWidth()) {
-                            style = if (style == "LORI 01") "BAKHTIARI 01" else "LORI 01"
-                        }
-
-                        Spacer(Modifier.weight(1f))
-
-                        PanelButton("DUAL KEYBOARD", Gold, Modifier.fillMaxWidth()) {
-                            dualKeyboard = !dualKeyboard
-                        }
+                    PanelButton("+", PanelColor) {
+                        transpose = (transpose + 1).coerceAtMost(12)
                     }
                 }
-
-                if (dualKeyboard) {
-                    KeyboardRow(keyCount, startNote, "UPPER")
-                    KeyboardRow(keyCount, startNote, "LOWER")
-                } else {
-                    KeyboardRow(keyCount, startNote, "KEYBOARD")
-                }
-
-                Text(
-                    "Prototype v0.1 • Audio engine not included yet",
-                    color = Color.LightGray,
-                    fontSize = 9.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Text("$transpose", color = GoldColor)
             }
         }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .background(Color(0xFF111111)),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PanelButton("SETTINGS", Color.DarkGray) {}
+            PanelButton("START / STOP", if (playing) RedColor else PanelColor) {
+                playing = !playing
+            }
+            Text(
+                if (playing) "PLAYING" else "STOPPED",
+                color = if (playing) Color.Green else Color.LightGray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            PanelButton("SYNCHRO", PanelColor) {}
+            PanelButton("TAP", PanelColor) {}
+        }
+
+        PianoKeyboard()
     }
 }
 
 @Composable
-private fun StatusLamp(label: String, on: Boolean, active: Color) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Box(
-            Modifier.size(8.dp)
-                .background(
-                    if (on) active else Color.DarkGray,
-                    RoundedCornerShape(50)
-                )
-        )
-        Text(label, color = Color.LightGray, fontSize = 9.sp)
-    }
-}
-
-@Composable
-private fun PanelButton(
+fun PanelButton(
     label: String,
-    tint: Color,
-    modifier: Modifier = Modifier,
+    color: Color,
     onClick: () -> Unit
 ) {
     Box(
-        modifier.heightIn(min = 30.dp)
+        modifier = Modifier
+            .padding(2.dp)
+            .defaultMinSize(minWidth = 42.dp, minHeight = 29.dp)
             .background(
                 Brush.verticalGradient(
-                    listOf(tint.copy(alpha = .95f), tint.copy(alpha = .55f))
+                    listOf(color.copy(alpha = 0.95f), Color.Black)
                 ),
-                RoundedCornerShape(6.dp)
+                RoundedCornerShape(5.dp)
             )
-            .border(1.dp, Color.White.copy(alpha = .18f), RoundedCornerShape(6.dp))
+            .border(1.dp, Color(0xFF777777), RoundedCornerShape(5.dp))
             .clickable { onClick() }
-            .padding(horizontal = 5.dp, vertical = 5.dp),
+            .padding(horizontal = 5.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             label,
             color = Color.White,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 2
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Composable
-private fun KeyboardRow(count: Int, start: String, label: String) {
-    val names = listOf("C", "D", "E", "F", "G", "A", "B")
-    val startIndex = names.indexOf(start).coerceAtLeast(0)
+fun ScreenButton(label: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .background(Color(0xFF263F68), RoundedCornerShape(4.dp))
+            .border(1.dp, Color(0xFF6686B5), RoundedCornerShape(4.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 9.dp, vertical = 7.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(label, color = Color.White, fontSize = 9.sp)
+    }
+}
+
+@Composable
+fun PianoKeyboard() {
+    val whiteKeys = listOf(
+        "C", "D", "E", "F", "G", "A", "B",
+        "C", "D", "E", "F", "G", "A", "B"
+    )
+    var pressedKey by remember { mutableStateOf("") }
 
     Row(
-        Modifier.fillMaxWidth().height(43.dp),
-        horizontalArrangement = Arrangement.spacedBy(1.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(105.dp)
+            .background(Color.Black)
+            .padding(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        repeat(count) { i ->
-            val note = names[(startIndex + i) % 7]
-            var pressed by remember { mutableStateOf(false) }
-
+        whiteKeys.forEach { key ->
             Box(
-                Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        if (pressed) Color(0xFFFFE5A6) else Color(0xFFF1F0E9),
+                        if (pressedKey == key) Color(0xFFFFDFA0)
+                        else Color(0xFFF3F0E9),
                         RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp)
                     )
-                    .border(1.dp, Color(0xFF9A9A92))
-                    .clickable { pressed = !pressed },
+                    .border(1.dp, Color.DarkGray)
+                    .clickable {
+                        pressedKey = if (pressedKey == key) "" else key
+                    },
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Text(
-                    if (i == 0) "$label\n$note" else note,
+                    key,
                     color = Color.DarkGray,
-                    fontSize = 8.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 3.dp)
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun SettingsScreen(
-    keyCount: Int,
-    onKeyCount: (Int) -> Unit,
-    startNote: String,
-    onStartNote: (String) -> Unit,
-    dual: Boolean,
-    onDual: (Boolean) -> Unit,
-    onBack: () -> Unit
-) {
-    Column(
-        Modifier.fillMaxSize().background(Panel).padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "KORG-SHAHZADE • SETTINGS",
-                color = Gold,
-                fontWeight = FontWeight.Black,
-                fontSize = 18.sp
-            )
-            PanelButton("BACK", Gold, Modifier.width(90.dp), onBack)
-        }
-
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Column(
-                Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(7.dp)
-            ) {
-                Text("Keyboard key count", color = Color.White)
-
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    listOf(7, 8, 9, 10, 11).forEach { n ->
-                        PanelButton(
-                            if (keyCount == n) "[$n]" else "$n",
-                            if (keyCount == n) Gold else PanelLight,
-                            Modifier.weight(1f)
-                        ) { onKeyCount(n) }
-                    }
-                }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    listOf(12, 13, 14, 21).forEach { n ->
-                        PanelButton(
-                            if (keyCount == n) "[$n]" else "$n",
-                            if (keyCount == n) Gold else PanelLight,
-                            Modifier.weight(1f)
-                        ) { onKeyCount(n) }
-                    }
-                }
-            }
-
-            Column(
-                Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(7.dp)
-            ) {
-                Text("Keyboard start note", color = Color.White)
-
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    listOf("C", "D", "E", "F", "G", "A", "B").forEach { n ->
-                        PanelButton(
-                            if (startNote == n) "[$n]" else n,
-                            if (startNote == n) Gold else PanelLight,
-                            Modifier.weight(1f)
-                        ) { onStartNote(n) }
-                    }
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Dual keyboard mode", color = Color.White, modifier = Modifier.weight(1f))
-                    Switch(checked = dual, onCheckedChange = onDual)
-                }
-            }
-        }
-
-        Text(
-            "First interface prototype. Audio features will be added in later development phases.",
-            color = Color.LightGray,
-            fontSize = 12.sp
-        )
     }
 }
